@@ -84,6 +84,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator& operator++() noexcept {
+            assert(node_ != nullptr);
             node_ = node_->next_node;
             return *this;
         }
@@ -102,6 +103,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ != nullptr);
             return node_->value;
         }
 
@@ -109,6 +111,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(node_ != nullptr);
             return &(node_->value);
         }
 
@@ -145,14 +148,8 @@ public:
 
     void swap(SingleLinkedList& other) noexcept {
 
-        auto size = other.size_;
-        auto node = other.head_.next_node;
-
-        other.size_ = size_;
-        other.head_.next_node = head_.next_node;
-
-        head_.next_node = node;
-        size_ = size;
+        std::swap(size_, other.size_);
+        std::swap(head_.next_node, other.head_.next_node);
     }
 
     ~SingleLinkedList() {
@@ -187,9 +184,8 @@ public:
     // Разыменовывать этот итератор нельзя — попытка разыменования приведёт к неопределённому поведению
     [[nodiscard]] Iterator end() noexcept {
         Iterator temp_iter = begin();
-        while(temp_iter.node_ != nullptr) {
-            temp_iter.node_ = temp_iter.node_ -> next_node;
-        }
+        for(auto i = size_; i > 0; --i)
+            ++temp_iter;
         return temp_iter;
     }
 
@@ -218,9 +214,8 @@ public:
     [[nodiscard]] ConstIterator cend() const noexcept {
 
         ConstIterator temp_iter = cbegin();
-        while(temp_iter.node_ != nullptr) {
-            temp_iter.node_ = temp_iter.node_ -> next_node;
-        }
+        for(auto i = size_; i > 0; --i)
+            ++temp_iter;
         return temp_iter;
     }
 
@@ -232,13 +227,12 @@ public:
 
     void PopFront() noexcept {
 
-        if(size_) {
-            auto first_node = head_.next_node;
-            auto second_node = first_node->next_node;
-            delete first_node;
-            head_.next_node = second_node;
-            --size_;
-        }
+        assert(size_);
+        auto first_node = head_.next_node;
+        auto second_node = first_node->next_node;
+        delete first_node;
+        head_.next_node = second_node;
+        --size_;
     }
 
     /*
@@ -296,15 +290,13 @@ public:
     // Очищает список за время O(N)
     void Clear() noexcept {
 
-        while(size_) {
-            Node* temp_ptr = head_.next_node;
+        Node* temp_ptr = nullptr;
+        while(head_.next_node) {
+            temp_ptr = head_.next_node;
             head_.next_node = head_.next_node -> next_node;
             delete temp_ptr;
-            --size_;
-            if(!size_) {
-                head_.next_node = nullptr;
-            }
         }
+        size_ = 0;
     }
 
     // Возвращает количество элементов в списке
@@ -314,7 +306,7 @@ public:
 
     // Сообщает, пустой ли список
     [[nodiscard]] bool IsEmpty() const noexcept {
-        return GetSize() ? false : true;
+        return GetSize() == 0;
     }
 
 private:
@@ -367,12 +359,12 @@ bool operator<(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& 
 
 template <typename Type>
 bool operator<=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return (lhs == rhs) || (lhs < rhs);
+    return !(rhs < lhs);
 }
 
 template <typename Type>
 bool operator>(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return !(lhs <= rhs) ;
+    return rhs < lhs;
 }
 
 template <typename Type>
