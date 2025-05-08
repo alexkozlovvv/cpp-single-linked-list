@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <cassert>
 
@@ -59,7 +60,7 @@ class SingleLinkedList {
         // Оператор сравнения итераторов (в роли второго аргумента выступает константный итератор)
         // Два итератора равны, если они ссылаются на один и тот же элемент списка либо на end()
         [[nodiscard]] bool operator==(const BasicIterator<const Type>& rhs) const noexcept {
-            return node_ == rhs.node_ ? true : false;
+            return node_ == rhs.node_;
         }
 
         // Оператор проверки итераторов на неравенство
@@ -94,9 +95,9 @@ class SingleLinkedList {
         // Инкремент итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         BasicIterator operator++(int) noexcept {
-            auto old_value(*this); // Сохраняем прежнее значение объекта для последующего возврата
+            auto old_iter(*this); // Сохраняем прежнее значение объекта для последующего возврата
             ++(*this); // используем логику префиксной формы инкремента
-            return old_value;
+            return old_iter;
         }
 
         // Операция разыменования. Возвращает ссылку на текущий элемент

@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# VScode files
+.vscode/*
+single-linked-list/build/*
+single-linked-list/olds.cpp
