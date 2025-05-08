@@ -32,6 +32,7 @@
         + BasicIterator operator++(int)
         + ValueType& operator*()
         + ValueType* operator->() 
+        ...()
     }
     SingleLinkedList *-- BasicIterator
 ```
